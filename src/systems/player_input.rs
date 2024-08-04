@@ -2,6 +2,7 @@ use crate::prelude::*;
 
 #[system]
 #[read_component(Point)]
+#[write_component(Health)]
 pub fn player_input(
     ecs: &mut SubWorld,
     commands: &mut CommandBuffer,
@@ -17,19 +18,50 @@ pub fn player_input(
             _ => Point::new(0, 0),
         };
 
-        <(Entity, &Point)>::query()
+        let (player_entity, destination) = <(Entity, &Point)>::query()
             .filter(component::<Player>())
             .iter(ecs)
-            .for_each(|(entity, pos)| {
-                let destination = *pos + delta;
+            .find_map(|(entity, pos)| Some((*entity, *pos + delta)))
+            .unwrap();
+
+        let mut did_something = false;
+        if delta != Point::zero() {
+            let mut hit_something = false;
+            <(Entity, &Point)>::query()
+                .filter(component::<Enemy>())
+                .iter(ecs)
+                .filter(|(_, pos)| **pos == destination)
+                .for_each(|(entity, _)| {
+                    hit_something = true;
+                    did_something = true;
+                    commands.push((
+                        (),
+                        WantsToAttack {
+                            attacker: player_entity,
+                            victim: *entity,
+                        },
+                    ));
+                });
+            if !hit_something {
+                did_something = true;
                 commands.push((
                     (),
                     WantsToMove {
-                        entity: *entity,
+                        entity: player_entity,
                         destination,
                     },
                 ));
-            });
+            }
+        }
+        if !did_something {
+            if let Ok(health) = ecs
+                .entry_mut(player_entity)
+                .unwrap()
+                .get_component_mut::<Health>()
+            {
+                health.current = i32::min(health.max, health.current + 1);
+            }
+        }
         *turn_state = TurnState::PlayerTurn;
     }
 }
