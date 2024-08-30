@@ -2,8 +2,9 @@ use crate::prelude::*;
 
 #[system]
 #[read_component(FieldOfView)]
+#[read_component(Point)]
 pub fn map_render(ecs: &SubWorld, #[resource] map: &Map, #[resource] camera: &Camera) {
-    let player_fov = <&FieldOfView>::query()
+    let (player_fov, player_pos) = <(&FieldOfView, &Point)>::query()
         .filter(component::<Player>())
         .iter(ecs)
         .nth(0)
@@ -18,7 +19,12 @@ pub fn map_render(ecs: &SubWorld, #[resource] map: &Map, #[resource] camera: &Ca
                 let tile_visible = player_fov.visible_tiles.contains(&point);
                 let idx = Map::map_idx(point);
                 if tile_visible || map.revealed_tiles[idx] {
-                    let tint = if tile_visible { WHITE } else { DARK_GRAY };
+                    let dist = DistanceAlg::Pythagoras.distance2d(*player_pos, point);
+                    let tint_scale = tint_scale_calc(
+                        if tile_visible { Some(dist) } else { None },
+                        player_fov.radius as f32,
+                    );
+                    let tint = RGB::from_f32(tint_scale, tint_scale, tint_scale);
                     let glyph = match map.tiles[idx] {
                         TileType::Floor => to_cp437('.'),
                         TileType::Wall => to_cp437('#'),

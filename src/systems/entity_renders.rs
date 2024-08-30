@@ -5,7 +5,7 @@ use crate::prelude::*;
 #[read_component(Point)]
 #[read_component(Render)]
 pub fn entity_render(ecs: &SubWorld, #[resource] camera: &Camera) {
-    let player_fov = <&FieldOfView>::query()
+    let (player_fov, player_pos) = <(&FieldOfView, &Point)>::query()
         .filter(component::<Player>())
         .iter(ecs)
         .nth(0)
@@ -19,7 +19,13 @@ pub fn entity_render(ecs: &SubWorld, #[resource] camera: &Camera) {
         .iter(ecs)
         .filter(|(pos, _)| player_fov.visible_tiles.contains(&pos))
         .for_each(|(pos, render)| {
-            draw_batch.set(*pos - offset, render.color, render.glyph);
+            let dist = DistanceAlg::Pythagoras.distance2d(*player_pos, *pos);
+            let tint_scale = tint_scale_calc(Some(dist), player_fov.radius as f32);
+            draw_batch.set(
+                *pos - offset,
+                tint_colorpair_conversion(render.color, tint_scale),
+                render.glyph,
+            );
         });
     draw_batch.submit(5000).expect("Batch error");
 }
