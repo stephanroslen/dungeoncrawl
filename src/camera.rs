@@ -19,29 +19,10 @@ impl Camera {
         result
     }
 
-    fn trim_value(lower: i32, val: i32, upper: i32) -> i32 {
-        use std::cmp::{max, min};
-
-        min(max(lower, val), upper)
-    }
-
     pub fn on_player_move(&mut self, player_position: Point) {
-        let adapted_player_position = Point::new(
-            Self::trim_value(
-                DISPLAY_WIDTH / 2,
-                player_position.x,
-                SCREEN_WIDTH - DISPLAY_WIDTH / 2,
-            ),
-            Self::trim_value(
-                DISPLAY_HEIGHT / 2,
-                player_position.y,
-                SCREEN_HEIGHT - DISPLAY_HEIGHT / 2 - 1,
-            ),
-        );
-
-        self.left_x = adapted_player_position.x - DISPLAY_WIDTH / 2;
+        self.left_x = player_position.x - DISPLAY_WIDTH / 2;
         self.right_x = self.left_x + DISPLAY_WIDTH;
-        self.top_y = adapted_player_position.y - DISPLAY_HEIGHT / 2;
+        self.top_y = player_position.y - DISPLAY_HEIGHT / 2;
         self.bottom_y = self.top_y + DISPLAY_HEIGHT;
     }
 }
