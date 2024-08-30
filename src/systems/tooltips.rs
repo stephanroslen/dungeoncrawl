@@ -16,11 +16,12 @@ pub fn tooltips(ecs: &SubWorld, #[resource] mouse_pos: &Point, #[resource] camer
         .filter(|(_, pos, _)| **pos == map_pos)
         .for_each(|(entity, _, name)| {
             let screen_pos = *mouse_pos * 4;
-            let display = if let Ok(health) = ecs.entry_ref(*entity).unwrap().get_component::<Health>() {
-                format!("{} : {} hp", &name.0, health.current)
-            } else {
-                name.0.clone()
-            };
+            let display =
+                if let Ok(health) = ecs.entry_ref(*entity).unwrap().get_component::<Health>() {
+                    format!("{} : {} hp", &name.0, health.current)
+                } else {
+                    name.0.clone()
+                };
             draw_batch.print(screen_pos, &display);
         });
     draw_batch.submit(10100).expect("Batch error");

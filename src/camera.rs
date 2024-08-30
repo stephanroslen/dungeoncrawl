@@ -27,8 +27,16 @@ impl Camera {
 
     pub fn on_player_move(&mut self, player_position: Point) {
         let adapted_player_position = Point::new(
-            Self::trim_value(DISPLAY_WIDTH/2, player_position.x, SCREEN_WIDTH - DISPLAY_WIDTH/2),
-            Self::trim_value(DISPLAY_HEIGHT/2, player_position.y, SCREEN_HEIGHT - DISPLAY_HEIGHT/2 - 1),
+            Self::trim_value(
+                DISPLAY_WIDTH / 2,
+                player_position.x,
+                SCREEN_WIDTH - DISPLAY_WIDTH / 2,
+            ),
+            Self::trim_value(
+                DISPLAY_HEIGHT / 2,
+                player_position.y,
+                SCREEN_HEIGHT - DISPLAY_HEIGHT / 2 - 1,
+            ),
         );
 
         self.left_x = adapted_player_position.x - DISPLAY_WIDTH / 2;
