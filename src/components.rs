@@ -5,7 +5,9 @@ use std::collections::HashSet;
 pub struct AmuletOfYala;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct ChasingPlayer;
+pub struct ChasingPlayer {
+    pub expecting_player_at: Option<Point>,
+}
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Enemy;
