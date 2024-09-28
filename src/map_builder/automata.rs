@@ -11,6 +11,7 @@ impl MapArchitect for CellularAutomataArchitect {
             monster_spawns: Vec::new(),
             player_start: Point::zero(),
             amulet_start: Point::zero(),
+            theme: random_theme(rng),
         };
         mb.fill(TileType::Wall);
         Self::random_noise_map(rng, &mut mb.map);

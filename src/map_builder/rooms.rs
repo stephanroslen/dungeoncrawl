@@ -11,6 +11,7 @@ impl MapArchitect for RoomsArchitect {
             monster_spawns: Vec::new(),
             player_start: Point::zero(),
             amulet_start: Point::zero(),
+            theme: random_theme(rng),
         };
         mb.fill(TileType::Wall);
         mb.build_random_rooms(rng);
