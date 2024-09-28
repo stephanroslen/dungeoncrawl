@@ -8,7 +8,6 @@ mod themes;
 use crate::prelude::*;
 use automata::CellularAutomataArchitect;
 use drunkard::DrunkardsWalkArchitect;
-use empty::EmptyArchitect;
 use prefab::apply_prefab;
 use rooms::RoomsArchitect;
 use themes::DungeonTheme;
