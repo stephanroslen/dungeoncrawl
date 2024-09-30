@@ -17,6 +17,7 @@ impl MapArchitect for RoomsArchitect {
         mb.build_random_rooms(rng);
         mb.build_corridors(rng);
         mb.player_start = mb.rooms[0].center();
+        prefab::apply_prefab(&mut mb, rng);
         mb.amulet_start = mb.find_most_distant();
         mb.entity_spawns = mb.spawn_monsters(mb.player_start, rng);
         mb

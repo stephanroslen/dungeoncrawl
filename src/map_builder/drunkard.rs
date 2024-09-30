@@ -34,6 +34,7 @@ impl MapArchitect for DrunkardsWalkArchitect {
             }
         }
         mb.entity_spawns = mb.spawn_monsters(center, rng);
+        prefab::apply_prefab(&mut mb, rng);
         mb.player_start = center;
         mb.amulet_start = mb.find_most_distant();
         mb

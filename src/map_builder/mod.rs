@@ -1,14 +1,13 @@
 mod automata;
 mod drunkard;
 mod empty;
-mod prefab;
+pub mod prefab;
 mod rooms;
 mod themes;
 
 use crate::prelude::*;
 use automata::CellularAutomataArchitect;
 use drunkard::DrunkardsWalkArchitect;
-use prefab::apply_prefab;
 use rooms::RoomsArchitect;
 use themes::DungeonTheme;
 use themes::ForestTheme;
@@ -161,9 +160,7 @@ impl MapBuilder {
             1 => Box::new(RoomsArchitect {}),
             _ => Box::new(CellularAutomataArchitect {}),
         };
-        let mut mb = architect.new(rng);
-        apply_prefab(&mut mb, rng);
-        mb
+        architect.new(rng)
     }
 }
 
