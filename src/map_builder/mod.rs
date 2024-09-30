@@ -160,7 +160,9 @@ impl MapBuilder {
             1 => Box::new(RoomsArchitect {}),
             _ => Box::new(CellularAutomataArchitect {}),
         };
-        architect.new(rng)
+        let mut mb = architect.new(rng);
+        mb.map.update_revealability();
+        mb
     }
 }
 

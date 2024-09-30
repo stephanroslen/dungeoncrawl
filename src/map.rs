@@ -1,5 +1,5 @@
-use crate::map::Revealed::Unrevealed;
 use crate::prelude::*;
+use std::collections::HashSet;
 
 const NUM_TILES: usize = (SCREEN_WIDTH * SCREEN_HEIGHT) as usize;
 
@@ -11,6 +11,7 @@ pub enum TileType {
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum Revealed {
+    Unrevealable,
     Unrevealed,
     Seen,
     FromMap,
@@ -25,7 +26,35 @@ impl Map {
     pub fn new() -> Self {
         Self {
             tiles: vec![TileType::Floor; NUM_TILES],
-            revealed_tiles: vec![Unrevealed; NUM_TILES],
+            revealed_tiles: vec![Revealed::Unrevealable; NUM_TILES],
+        }
+    }
+
+    pub fn update_revealability(&mut self) {
+        let mut revealable_indices = HashSet::new();
+        self.tiles.iter().enumerate().for_each(|(idx, tile)| {
+            if !Self::is_opaque(*tile) {
+                let point_for_idx = self.index_to_point2d(idx);
+                let offsets = [
+                    Point::new(-1, -1),
+                    Point::new(0, -1),
+                    Point::new(1, -1),
+                    Point::new(-1, 0),
+                    Point::new(0, 0),
+                    Point::new(1, 0),
+                    Point::new(-1, 1),
+                    Point::new(0, 1),
+                    Point::new(1, 1),
+                ];
+                for offset in offsets {
+                    let point = point_for_idx + offset;
+                    let idx_for_point = self.point2d_to_index(point);
+                    revealable_indices.insert(idx_for_point);
+                }
+            }
+        });
+        for idx in revealable_indices {
+            self.revealed_tiles[idx] = Revealed::Unrevealed;
         }
     }
 
@@ -62,6 +91,10 @@ impl Map {
             None
         }
     }
+
+    fn is_opaque(tile_type: TileType) -> bool {
+        tile_type != TileType::Floor
+    }
 }
 
 impl BaseMap for Map {
@@ -89,7 +122,7 @@ impl BaseMap for Map {
     }
 
     fn is_opaque(&self, idx: usize) -> bool {
-        self.tiles[idx] != TileType::Floor
+        Self::is_opaque(self.tiles[idx])
     }
 }
 

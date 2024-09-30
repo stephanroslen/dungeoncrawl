@@ -23,7 +23,10 @@ pub fn map_render(
             if Map::in_bounds(point) {
                 let tile_visible = player_fov.visible_tiles.contains(&point);
                 let idx = Map::map_idx(point);
-                if tile_visible || map.revealed_tiles[idx] != Revealed::Unrevealed {
+                if tile_visible
+                    || map.revealed_tiles[idx] == Revealed::Seen
+                    || map.revealed_tiles[idx] == Revealed::FromMap
+                {
                     let tint = if tile_visible || map.revealed_tiles[idx] == Revealed::Seen {
                         let dist = DistanceAlg::Pythagoras.distance2d(*player_pos, point);
                         let tint_scale = tint_scale_calc(
