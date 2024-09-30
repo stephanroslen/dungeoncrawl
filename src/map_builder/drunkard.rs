@@ -8,7 +8,7 @@ impl MapArchitect for DrunkardsWalkArchitect {
         let mut mb = MapBuilder {
             map: Map::new(),
             rooms: Vec::new(),
-            monster_spawns: Vec::new(),
+            entity_spawns: Vec::new(),
             player_start: Point::zero(),
             amulet_start: Point::zero(),
             theme: random_theme(rng),
@@ -33,7 +33,7 @@ impl MapArchitect for DrunkardsWalkArchitect {
                 }
             }
         }
-        mb.monster_spawns = mb.spawn_monsters(center, rng);
+        mb.entity_spawns = mb.spawn_monsters(center, rng);
         mb.player_start = center;
         mb.amulet_start = mb.find_most_distant();
         mb

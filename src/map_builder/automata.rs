@@ -8,7 +8,7 @@ impl MapArchitect for CellularAutomataArchitect {
         let mut mb = MapBuilder {
             map: Map::new(),
             rooms: Vec::new(),
-            monster_spawns: Vec::new(),
+            entity_spawns: Vec::new(),
             player_start: Point::zero(),
             amulet_start: Point::zero(),
             theme: random_theme(rng),
@@ -20,7 +20,7 @@ impl MapArchitect for CellularAutomataArchitect {
         }
         let start = Self::find_start(&mb.map);
         mb.fill_unreachable(start);
-        mb.monster_spawns = mb.spawn_monsters(start, rng);
+        mb.entity_spawns = mb.spawn_monsters(start, rng);
         mb.player_start = start;
         mb.amulet_start = mb.find_most_distant();
         mb

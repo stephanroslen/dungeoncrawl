@@ -1,6 +1,32 @@
 use crate::prelude::*;
 
+fn use_item(n: usize, ecs: &mut SubWorld, commands: &mut CommandBuffer) -> Point {
+    let player_entity = <Entity>::query()
+        .filter(component::<Player>())
+        .iter(ecs)
+        .nth(0)
+        .map(|entity| *entity)
+        .unwrap();
+    let item_entity = <(Entity, &Carried)>::query()
+        .filter(component::<Item>())
+        .iter(ecs)
+        .filter(|(_, carried)| carried.by == player_entity)
+        .nth(n)
+        .map(|(entity, _)| *entity);
+    if let Some(item_entity) = item_entity {
+        commands.push((
+            (),
+            ActivateItem {
+                used_by: player_entity,
+                item: item_entity,
+            },
+        ));
+    }
+    Point::new(0, 0)
+}
+
 #[system]
+#[read_component(Carried)]
 #[read_component(Point)]
 #[write_component(Health)]
 pub fn player_input(
@@ -10,21 +36,44 @@ pub fn player_input(
     #[resource] turn_state: &mut TurnState,
 ) {
     if let Some(key) = key {
+        let mut players = <(Entity, &Point)>::query().filter(component::<Player>());
         let delta = match key {
             VirtualKeyCode::Left => Point::new(-1, 0),
             VirtualKeyCode::Right => Point::new(1, 0),
             VirtualKeyCode::Up => Point::new(0, -1),
             VirtualKeyCode::Down => Point::new(0, 1),
+            VirtualKeyCode::G => {
+                let (player, player_pos) = players
+                    .iter(ecs)
+                    .find_map(|(entity, pos)| Some((*entity, *pos)))
+                    .unwrap();
+                <(Entity, &Point)>::query()
+                    .filter(component::<Item>())
+                    .iter(ecs)
+                    .filter(|(_, &item_pos)| item_pos == player_pos)
+                    .for_each(|(entity, _)| {
+                        commands.remove_component::<Point>(*entity);
+                        commands.add_component(*entity, Carried { by: player });
+                    });
+                Point::new(0, 0)
+            }
+            VirtualKeyCode::Key1 => use_item(0, ecs, commands),
+            VirtualKeyCode::Key2 => use_item(1, ecs, commands),
+            VirtualKeyCode::Key3 => use_item(2, ecs, commands),
+            VirtualKeyCode::Key4 => use_item(3, ecs, commands),
+            VirtualKeyCode::Key5 => use_item(4, ecs, commands),
+            VirtualKeyCode::Key6 => use_item(5, ecs, commands),
+            VirtualKeyCode::Key7 => use_item(6, ecs, commands),
+            VirtualKeyCode::Key8 => use_item(7, ecs, commands),
+            VirtualKeyCode::Key9 => use_item(8, ecs, commands),
             _ => Point::new(0, 0),
         };
 
-        let (player_entity, destination) = <(Entity, &Point)>::query()
-            .filter(component::<Player>())
+        let (player_entity, destination) = players
             .iter(ecs)
             .find_map(|(entity, pos)| Some((*entity, *pos + delta)))
             .unwrap();
 
-        let mut did_something = false;
         if delta != Point::zero() {
             let mut hit_something = false;
             <(Entity, &Point)>::query()
@@ -33,7 +82,6 @@ pub fn player_input(
                 .filter(|(_, pos)| **pos == destination)
                 .for_each(|(entity, _)| {
                     hit_something = true;
-                    did_something = true;
                     commands.push((
                         (),
                         WantsToAttack {
@@ -43,7 +91,6 @@ pub fn player_input(
                     ));
                 });
             if !hit_something {
-                did_something = true;
                 commands.push((
                     (),
                     WantsToMove {
@@ -51,15 +98,6 @@ pub fn player_input(
                         destination,
                     },
                 ));
-            }
-        }
-        if !did_something {
-            if let Ok(health) = ecs
-                .entry_mut(player_entity)
-                .unwrap()
-                .get_component_mut::<Health>()
-            {
-                health.current = i32::min(health.max, health.current + 1);
             }
         }
         *turn_state = TurnState::PlayerTurn;

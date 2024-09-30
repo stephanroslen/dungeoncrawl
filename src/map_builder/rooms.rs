@@ -8,7 +8,7 @@ impl MapArchitect for RoomsArchitect {
         let mut mb = MapBuilder {
             map: Map::new(),
             rooms: Vec::new(),
-            monster_spawns: Vec::new(),
+            entity_spawns: Vec::new(),
             player_start: Point::zero(),
             amulet_start: Point::zero(),
             theme: random_theme(rng),
@@ -18,7 +18,7 @@ impl MapArchitect for RoomsArchitect {
         mb.build_corridors(rng);
         mb.player_start = mb.rooms[0].center();
         mb.amulet_start = mb.find_most_distant();
-        mb.monster_spawns = mb.spawn_monsters(mb.player_start, rng);
+        mb.entity_spawns = mb.spawn_monsters(mb.player_start, rng);
         mb
     }
 }

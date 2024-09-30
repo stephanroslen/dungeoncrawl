@@ -8,6 +8,32 @@ fn orc() -> (i32, String, FontCharType) {
     (2, "Orc".to_string(), to_cp437('o'))
 }
 
+pub fn spawn_healing_potion(ecs: &mut World, pos: Point) {
+    ecs.push((
+        Item,
+        pos,
+        Render {
+            color: ColorPair::new(WHITE, BLACK),
+            glyph: to_cp437('!'),
+        },
+        Name("Healing Potion".to_string()),
+        ProvidesHealing { amount: 6 },
+    ));
+}
+
+pub fn spawn_magic_mapper(ecs: &mut World, pos: Point) {
+    ecs.push((
+        Item,
+        pos,
+        Render {
+            color: ColorPair::new(WHITE, BLACK),
+            glyph: to_cp437('{'),
+        },
+        Name("Dungeon Map".to_string()),
+        ProvidesDungeonMap {},
+    ));
+}
+
 pub fn spawn_monster(ecs: &mut World, rng: &mut RandomNumberGenerator, pos: Point) {
     let (hp, name, glyph) = match rng.roll_dice(1, 10) {
         1..=8 => goblin(),
@@ -30,6 +56,25 @@ pub fn spawn_monster(ecs: &mut World, rng: &mut RandomNumberGenerator, pos: Poin
         Name(name),
         FieldOfView::new(6),
     ));
+}
+
+pub fn spawn_entity(ecs: &mut World, rng: &mut RandomNumberGenerator, pos: Point) {
+    match rng.roll_dice(1, 25) {
+        1..=2 => spawn_healing_potion(ecs, pos),
+        3 => {
+            let spawned_magic_mapper = <Entity>::query()
+                .filter(component::<ProvidesDungeonMap>())
+                .iter(ecs)
+                .nth(0)
+                .is_some();
+            if spawned_magic_mapper {
+                spawn_monster(ecs, rng, pos)
+            } else {
+                spawn_magic_mapper(ecs, pos);
+            }
+        }
+        _ => spawn_monster(ecs, rng, pos),
+    }
 }
 
 pub fn spawn_player(ecs: &mut World, pos: Point) {
