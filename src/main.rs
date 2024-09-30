@@ -16,7 +16,8 @@ mod prelude {
     pub const SCREEN_HEIGHT: i32 = 50;
     pub const DISPLAY_WIDTH: i32 = SCREEN_WIDTH / 2;
     pub const DISPLAY_HEIGHT: i32 = SCREEN_HEIGHT / 2;
-    pub const FOREGROUND_MIN: f32 = 0.2;
+    pub const FOREGROUND_MIN: f32 = 0.25;
+    pub const FOREGROUND_FROM_MAP: f32 = 0.15;
     pub use crate::camera::*;
     pub use crate::components::*;
     pub use crate::map::*;

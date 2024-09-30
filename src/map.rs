@@ -1,3 +1,4 @@
+use crate::map::Revealed::Unrevealed;
 use crate::prelude::*;
 
 const NUM_TILES: usize = (SCREEN_WIDTH * SCREEN_HEIGHT) as usize;
@@ -8,16 +9,23 @@ pub enum TileType {
     Floor,
 }
 
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum Revealed {
+    Unrevealed,
+    Seen,
+    FromMap,
+}
+
 pub struct Map {
     pub tiles: Vec<TileType>,
-    pub revealed_tiles: Vec<bool>,
+    pub revealed_tiles: Vec<Revealed>,
 }
 
 impl Map {
     pub fn new() -> Self {
         Self {
             tiles: vec![TileType::Floor; NUM_TILES],
-            revealed_tiles: vec![false; NUM_TILES],
+            revealed_tiles: vec![Unrevealed; NUM_TILES],
         }
     }
 

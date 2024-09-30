@@ -23,13 +23,21 @@ pub fn map_render(
             if Map::in_bounds(point) {
                 let tile_visible = player_fov.visible_tiles.contains(&point);
                 let idx = Map::map_idx(point);
-                if tile_visible || map.revealed_tiles[idx] {
-                    let dist = DistanceAlg::Pythagoras.distance2d(*player_pos, point);
-                    let tint_scale = tint_scale_calc(
-                        if tile_visible { Some(dist) } else { None },
-                        player_fov.radius as f32,
-                    );
-                    let tint = RGB::from_f32(tint_scale, tint_scale, tint_scale);
+                if tile_visible || map.revealed_tiles[idx] != Revealed::Unrevealed {
+                    let tint = if tile_visible || map.revealed_tiles[idx] == Revealed::Seen {
+                        let dist = DistanceAlg::Pythagoras.distance2d(*player_pos, point);
+                        let tint_scale = tint_scale_calc(
+                            if tile_visible { Some(dist) } else { None },
+                            player_fov.radius as f32,
+                        );
+                        RGB::from_f32(tint_scale, tint_scale, tint_scale)
+                    } else {
+                        RGB::from_f32(
+                            FOREGROUND_FROM_MAP,
+                            FOREGROUND_FROM_MAP,
+                            FOREGROUND_FROM_MAP,
+                        )
+                    };
                     let glyph = theme.tile_to_render(map.tiles[idx]);
                     draw_batch.set(point - offset, ColorPair::new(tint, BLACK), glyph);
                 }

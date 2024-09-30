@@ -21,7 +21,7 @@ pub fn movement(
                 if entry.get_component::<Player>().is_ok() {
                     camera.on_player_move(want_move.destination);
                     fov.visible_tiles.iter().for_each(|pos| {
-                        map.revealed_tiles[Map::map_idx(*pos)] = true;
+                        map.revealed_tiles[Map::map_idx(*pos)] = Revealed::Seen;
                     })
                 }
             }
