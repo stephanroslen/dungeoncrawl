@@ -1,5 +1,4 @@
 use crate::prelude::*;
-use std::collections::HashSet;
 
 const NUM_TILES: usize = (SCREEN_WIDTH * SCREEN_HEIGHT) as usize;
 
@@ -31,10 +30,11 @@ impl Map {
     }
 
     pub fn update_revealability(&mut self) {
-        let mut revealable_indices = HashSet::new();
-        self.tiles.iter().enumerate().for_each(|(idx, tile)| {
+        let tiles = &self.tiles;
+        let revealed = &mut self.revealed_tiles;
+        tiles.iter().enumerate().for_each(|(idx, tile)| {
             if !Self::is_opaque(*tile) {
-                let point_for_idx = self.index_to_point2d(idx);
+                let point_for_idx = Self::map_point(idx);
                 let offsets = [
                     Point::new(-1, -1),
                     Point::new(0, -1),
@@ -48,14 +48,11 @@ impl Map {
                 ];
                 for offset in offsets {
                     let point = point_for_idx + offset;
-                    let idx_for_point = self.point2d_to_index(point);
-                    revealable_indices.insert(idx_for_point);
+                    let idx_for_point = Self::map_idx(point);
+                    revealed[idx_for_point] = Revealed::Unrevealed;
                 }
             }
         });
-        for idx in revealable_indices {
-            self.revealed_tiles[idx] = Revealed::Unrevealed;
-        }
     }
 
     pub fn in_bounds(point: Point) -> bool {
@@ -68,6 +65,10 @@ impl Map {
 
     pub fn map_idx(point: Point) -> usize {
         ((point.y * SCREEN_WIDTH) + point.x) as usize
+    }
+
+    pub fn map_point(idx: usize) -> Point {
+        Point::new(idx % SCREEN_WIDTH as usize, idx / SCREEN_WIDTH as usize)
     }
 
     pub fn try_idx(point: Point) -> Option<usize> {
