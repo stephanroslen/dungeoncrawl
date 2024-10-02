@@ -155,6 +155,14 @@ impl GameState for State {
             TurnState::GameOver => self.game_over(ctx),
             TurnState::Victory => self.victory(ctx),
         };
+        let mut draw_batch = DrawBatch::new();
+        draw_batch.target(2);
+        draw_batch.print_color(
+            Point::new(SCREEN_WIDTH * 2 - 7, SCREEN_HEIGHT * 2 - 1),
+            format!("fps: {}", ctx.fps),
+            ColorPair::new(GRAY, BLACK),
+        );
+        draw_batch.submit(11000).expect("Batch error");
         render_draw_buffer(ctx).expect("Render error");
     }
 }
