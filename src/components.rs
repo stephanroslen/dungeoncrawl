@@ -59,7 +59,9 @@ pub struct Player;
 pub struct MovingRandomly;
 
 #[derive(Clone, PartialEq)]
-pub struct Name(pub String);
+pub struct Name {
+    pub name: String,
+}
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ProvidesDungeonMap;

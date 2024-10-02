@@ -16,7 +16,9 @@ pub fn spawn_healing_potion(ecs: &mut World, pos: Point) {
             color: ColorPair::new(WHITE, BLACK),
             glyph: to_cp437('!'),
         },
-        Name("Healing Potion".to_string()),
+        Name {
+            name: "Healing Potion".to_string(),
+        },
         ProvidesHealing { amount: 6 },
     ));
 }
@@ -29,7 +31,9 @@ pub fn spawn_magic_mapper(ecs: &mut World, pos: Point) {
             color: ColorPair::new(WHITE, BLACK),
             glyph: to_cp437('{'),
         },
-        Name("Dungeon Map".to_string()),
+        Name {
+            name: "Dungeon Map".to_string(),
+        },
         ProvidesDungeonMap {},
     ));
 }
@@ -54,7 +58,7 @@ pub fn spawn_monster(ecs: &mut World, rng: &mut RandomNumberGenerator, pos: Poin
             current: hp,
             max: hp,
         },
-        Name(name),
+        Name { name: name },
         FieldOfView::new(6),
     ));
 }
@@ -103,6 +107,8 @@ pub fn spawn_amulet_of_yala(ecs: &mut World, pos: Point) {
             color: ColorPair::new(WHITE, BLACK),
             glyph: to_cp437('|'),
         },
-        Name("Amulet of Yala".to_string()),
+        Name {
+            name: "Amulet of Yala".to_string(),
+        },
     ));
 }

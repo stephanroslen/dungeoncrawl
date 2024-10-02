@@ -25,9 +25,9 @@ pub fn tooltips(ecs: &SubWorld, #[resource] mouse_pos: &Point, #[resource] camer
             let screen_pos = *mouse_pos * 4;
             let display =
                 if let Ok(health) = ecs.entry_ref(*entity).unwrap().get_component::<Health>() {
-                    format!("{} : {} hp", &name.0, health.current)
+                    format!("{} : {} hp", &name.name, health.current)
                 } else {
-                    name.0.clone()
+                    name.name.clone()
                 };
             draw_batch.print(screen_pos, &display);
         });

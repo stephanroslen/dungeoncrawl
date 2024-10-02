@@ -22,7 +22,7 @@ pub fn hud(ecs: &SubWorld) {
         .iter(ecs)
         .filter(|(_, carried)| carried.by == player_entity)
         .for_each(|(name, _)| {
-            draw_batch.print(Point::new(3, y), format!("{} : {}", y - 2, name.0));
+            draw_batch.print(Point::new(3, y), format!("{} : {}", y - 2, name.name));
             y += 1;
         });
     if y > 3 {
