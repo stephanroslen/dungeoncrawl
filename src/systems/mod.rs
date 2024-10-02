@@ -1,6 +1,5 @@
 use crate::prelude::*;
 
-mod chasing;
 mod combat;
 mod end_turn;
 mod entity_renders;
@@ -10,6 +9,7 @@ mod map_render;
 mod movement;
 mod player_input;
 mod random_move;
+mod roaming_and_chasing;
 mod tooltips;
 mod use_items;
 
@@ -45,7 +45,7 @@ pub fn build_player_scheduler() -> Schedule {
 pub fn build_monster_scheduler() -> Schedule {
     Schedule::builder()
         .add_system(random_move::random_move_system())
-        .add_system(chasing::chasing_system())
+        .add_system(roaming_and_chasing::roaming_and_chasing_system())
         .flush()
         .add_system(use_items::use_items_system())
         .add_system(combat::combat_system())

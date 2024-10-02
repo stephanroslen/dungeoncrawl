@@ -46,8 +46,9 @@ pub fn spawn_monster(ecs: &mut World, rng: &mut RandomNumberGenerator, pos: Poin
             color: ColorPair::new(WHITE, BLACK),
             glyph,
         },
-        ChasingPlayer {
-            expecting_player_at: None,
+        RoamingAndChasingPlayer {
+            home_location: pos,
+            going_to: None,
         },
         Health {
             current: hp,

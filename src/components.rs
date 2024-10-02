@@ -16,11 +16,6 @@ pub struct Carried {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub struct ChasingPlayer {
-    pub expecting_player_at: Option<Point>,
-}
-
-#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Enemy;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -78,6 +73,12 @@ pub struct ProvidesHealing {
 pub struct Render {
     pub color: ColorPair,
     pub glyph: FontCharType,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct RoamingAndChasingPlayer {
+    pub home_location: Point,
+    pub going_to: Option<Point>,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]

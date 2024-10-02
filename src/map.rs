@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use std::collections::HashMap;
 
 const NUM_TILES: usize = (SCREEN_WIDTH * SCREEN_HEIGHT) as usize;
 
@@ -19,6 +20,7 @@ pub enum Revealed {
 pub struct Map {
     pub tiles: Vec<TileType>,
     pub revealed_tiles: Vec<Revealed>,
+    pub dijkstra_maps: std::collections::HashMap<usize, DijkstraMap>,
 }
 
 impl Map {
@@ -26,6 +28,7 @@ impl Map {
         Self {
             tiles: vec![TileType::Floor; NUM_TILES],
             revealed_tiles: vec![Revealed::Unrevealable; NUM_TILES],
+            dijkstra_maps: std::collections::HashMap::new(),
         }
     }
 
@@ -95,6 +98,21 @@ impl Map {
 
     fn is_opaque(tile_type: TileType) -> bool {
         tile_type != TileType::Floor
+    }
+
+    pub fn update_dijkstra_maps(&mut self) {
+        let tiles = &self.tiles;
+        let mut dijkstra_maps = HashMap::new();
+        tiles.iter().enumerate().for_each(|(idx, _)| {
+            if self.can_enter_tile(Self::map_point(idx)) {
+                let target = vec![idx];
+                dijkstra_maps.insert(
+                    idx,
+                    DijkstraMap::new(SCREEN_WIDTH, SCREEN_HEIGHT, &target, self, 1024.0),
+                );
+            };
+        });
+        self.dijkstra_maps = dijkstra_maps;
     }
 }
 

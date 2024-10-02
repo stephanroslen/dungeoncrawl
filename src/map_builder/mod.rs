@@ -162,6 +162,7 @@ impl MapBuilder {
         };
         let mut mb = architect.new(rng);
         mb.map.update_revealability();
+        mb.map.update_dijkstra_maps();
         mb
     }
 }
