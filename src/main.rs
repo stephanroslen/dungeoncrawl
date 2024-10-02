@@ -158,7 +158,7 @@ impl GameState for State {
         let mut draw_batch = DrawBatch::new();
         draw_batch.target(2);
         draw_batch.print_color(
-            Point::new(SCREEN_WIDTH * 2 - 7, SCREEN_HEIGHT * 2 - 1),
+            Point::new(SCREEN_WIDTH * 2 - 7, 0),
             format!("fps: {}", ctx.fps),
             ColorPair::new(GRAY, BLACK),
         );

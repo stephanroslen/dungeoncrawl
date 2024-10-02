@@ -33,16 +33,19 @@ pub fn hud(ecs: &SubWorld) {
         );
     }
 
-    draw_batch.print_centered(1, "Explore the Dungeon. Cursor keys to move.");
+    draw_batch.print_centered(
+        0,
+        "Explore the Dungeon. Cursor keys to move. G to pick up item and number to use it.",
+    );
     draw_batch.bar_horizontal(
-        Point::zero(),
+        Point::new(0, SCREEN_HEIGHT * 2 - 1),
         SCREEN_WIDTH * 2,
         player_health.current,
         player_health.max,
         ColorPair::new(RED, BLACK),
     );
     draw_batch.print_color_centered(
-        0,
+        SCREEN_HEIGHT * 2 - 1,
         format!(
             " Health: {} / {} ",
             player_health.current, player_health.max
