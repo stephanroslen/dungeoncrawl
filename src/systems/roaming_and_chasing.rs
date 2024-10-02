@@ -55,7 +55,10 @@ pub fn roaming_and_chasing(
                     1 => Some(roaming_and_chasing_player.home_location),
                     2..5 => {
                         let idx = Map::map_idx(*pos);
-                        let targets = map.dijkstra_maps[&idx]
+                        let dijkstra_map = &map.dijkstra_maps[idx];
+                        let targets = dijkstra_map
+                            .as_ref()
+                            .unwrap()
                             .map
                             .iter()
                             .enumerate()
@@ -76,7 +79,7 @@ pub fn roaming_and_chasing(
         .for_each(|(entity, pos, roaming_and_chasing_player)| {
             if let Some(going_to) = roaming_and_chasing_player.going_to {
                 let idx = Map::map_idx(*pos);
-                let dijkstra_map = &map.dijkstra_maps[&Map::map_idx(going_to)];
+                let dijkstra_map = map.dijkstra_maps[Map::map_idx(going_to)].as_ref().unwrap();
                 if let Some(destination) = sample_lowest_exit(&mut rng, &dijkstra_map, idx, map) {
                     let distance = DistanceAlg::Pythagoras.distance2d(*pos, going_to);
                     let destination = if distance > 1.2 {

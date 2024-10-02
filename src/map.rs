@@ -1,5 +1,4 @@
 use crate::prelude::*;
-use std::collections::HashMap;
 
 const NUM_TILES: usize = (SCREEN_WIDTH * SCREEN_HEIGHT) as usize;
 
@@ -20,7 +19,7 @@ pub enum Revealed {
 pub struct Map {
     pub tiles: Vec<TileType>,
     pub revealed_tiles: Vec<Revealed>,
-    pub dijkstra_maps: std::collections::HashMap<usize, DijkstraMap>,
+    pub dijkstra_maps: Vec<Option<DijkstraMap>>,
 }
 
 impl Map {
@@ -28,7 +27,7 @@ impl Map {
         Self {
             tiles: vec![TileType::Floor; NUM_TILES],
             revealed_tiles: vec![Revealed::Unrevealable; NUM_TILES],
-            dijkstra_maps: std::collections::HashMap::new(),
+            dijkstra_maps: (0..NUM_TILES).map(|_| None).collect(),
         }
     }
 
@@ -102,14 +101,17 @@ impl Map {
 
     pub fn update_dijkstra_maps(&mut self) {
         let tiles = &self.tiles;
-        let mut dijkstra_maps = HashMap::new();
+        let mut dijkstra_maps: Vec<Option<DijkstraMap>> = (0..NUM_TILES).map(|_| None).collect();
         tiles.iter().enumerate().for_each(|(idx, _)| {
             if self.can_enter_tile(Self::map_point(idx)) {
                 let target = vec![idx];
-                dijkstra_maps.insert(
-                    idx,
-                    DijkstraMap::new(SCREEN_WIDTH, SCREEN_HEIGHT, &target, self, 1024.0),
-                );
+                dijkstra_maps[idx] = Some(DijkstraMap::new(
+                    SCREEN_WIDTH,
+                    SCREEN_HEIGHT,
+                    &target,
+                    self,
+                    1024.0,
+                ));
             };
         });
         self.dijkstra_maps = dijkstra_maps;
