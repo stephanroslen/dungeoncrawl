@@ -12,7 +12,7 @@ pub fn hud(ecs: &SubWorld) {
     let (player_entity, player_health) = <(Entity, &Health)>::query()
         .filter(component::<Player>())
         .iter(ecs)
-        .nth(0)
+        .next()
         .map(|(entity, health)| (*entity, health))
         .unwrap();
 

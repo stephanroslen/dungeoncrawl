@@ -8,7 +8,7 @@ pub fn end_turn(ecs: &SubWorld, #[resource] turn_state: &mut TurnState) {
     let amulet_pos = <&Point>::query()
         .filter(component::<AmuletOfYala>())
         .iter(ecs)
-        .nth(0)
+        .next()
         .unwrap();
     let current_state = turn_state.clone();
 

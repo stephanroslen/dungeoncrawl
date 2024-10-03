@@ -58,7 +58,7 @@ pub fn spawn_monster(ecs: &mut World, rng: &mut RandomNumberGenerator, pos: Poin
             current: hp,
             max: hp,
         },
-        Name { name: name },
+        Name { name },
         FieldOfView::new(6),
     ));
 }
@@ -70,7 +70,7 @@ pub fn spawn_entity(ecs: &mut World, rng: &mut RandomNumberGenerator, pos: Point
             let spawned_magic_mapper = <Entity>::query()
                 .filter(component::<ProvidesDungeonMap>())
                 .iter(ecs)
-                .nth(0)
+                .next()
                 .is_some();
             if spawned_magic_mapper {
                 spawn_monster(ecs, rng, pos)

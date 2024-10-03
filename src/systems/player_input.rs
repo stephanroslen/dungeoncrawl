@@ -4,7 +4,7 @@ fn use_item(n: usize, ecs: &mut SubWorld, commands: &mut CommandBuffer) -> Point
     let player_entity = <Entity>::query()
         .filter(component::<Player>())
         .iter(ecs)
-        .nth(0)
+        .next()
         .map(|entity| *entity)
         .unwrap();
     let item_entity = <(Entity, &Carried)>::query()
@@ -45,7 +45,8 @@ pub fn player_input(
             VirtualKeyCode::G => {
                 let (player, player_pos) = players
                     .iter(ecs)
-                    .find_map(|(entity, pos)| Some((*entity, *pos)))
+                    .map(|(entity, pos)| (*entity, *pos))
+                    .next()
                     .unwrap();
                 <(Entity, &Point)>::query()
                     .filter(component::<Item>())
@@ -71,7 +72,8 @@ pub fn player_input(
 
         let (player_entity, destination) = players
             .iter(ecs)
-            .find_map(|(entity, pos)| Some((*entity, *pos + delta)))
+            .map(|(entity, pos)| (*entity, *pos + delta))
+            .next()
             .unwrap();
 
         if delta != Point::zero() {

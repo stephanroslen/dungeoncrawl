@@ -12,7 +12,7 @@ pub fn map_render(
     let (player_fov, player_pos) = <(&FieldOfView, &Point)>::query()
         .filter(component::<Player>())
         .iter(ecs)
-        .nth(0)
+        .next()
         .unwrap();
     let mut draw_batch = DrawBatch::new();
     draw_batch.target(0);

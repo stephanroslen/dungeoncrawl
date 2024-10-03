@@ -12,16 +12,12 @@ fn sample_lowest_exit(
         return None;
     }
 
-    exits.sort_by(|a, b| {
-        dm.map[a.0 as usize]
-            .partial_cmp(&dm.map[b.0 as usize])
-            .unwrap()
-    });
+    exits.sort_by(|a, b| dm.map[a.0].partial_cmp(&dm.map[b.0]).unwrap());
 
     let options: Vec<usize> = exits
         .iter()
         .filter(|(idx, _)| dm.map[*idx] == dm.map[exits[0].0])
-        .map(|(idx, _)| *idx as usize)
+        .map(|(idx, _)| *idx)
         .collect();
 
     let rsi = rng.random_slice_index(&options).unwrap();
@@ -40,7 +36,7 @@ pub fn roaming_and_chasing(
 ) {
     let mut rng = RandomNumberGenerator::new();
 
-    let player_pos = *<(&Point, &Player)>::query().iter(ecs).nth(0).unwrap().0;
+    let player_pos = *<(&Point, &Player)>::query().iter(ecs).next().unwrap().0;
 
     <(&Point, &FieldOfView, &mut RoamingAndChasingPlayer)>::query()
         .iter_mut(ecs)
@@ -80,7 +76,7 @@ pub fn roaming_and_chasing(
             if let Some(going_to) = roaming_and_chasing_player.going_to {
                 let idx = Map::map_idx(*pos);
                 let dijkstra_map = map.dijkstra_maps[Map::map_idx(going_to)].as_ref().unwrap();
-                if let Some(destination) = sample_lowest_exit(&mut rng, &dijkstra_map, idx, map) {
+                if let Some(destination) = sample_lowest_exit(&mut rng, dijkstra_map, idx, map) {
                     let distance = DistanceAlg::Pythagoras.distance2d(*pos, going_to);
                     let destination = if distance > 1.2 {
                         map.index_to_point2d(destination)

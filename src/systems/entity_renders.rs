@@ -8,7 +8,7 @@ pub fn entity_render(ecs: &SubWorld, #[resource] camera: &Camera) {
     let (player_fov, player_pos) = <(&FieldOfView, &Point)>::query()
         .filter(component::<Player>())
         .iter(ecs)
-        .nth(0)
+        .next()
         .unwrap();
 
     let mut draw_batch = DrawBatch::new();
@@ -17,7 +17,7 @@ pub fn entity_render(ecs: &SubWorld, #[resource] camera: &Camera) {
 
     <(&Point, &Render)>::query()
         .iter(ecs)
-        .filter(|(pos, _)| player_fov.visible_tiles.contains(&pos))
+        .filter(|(pos, _)| player_fov.visible_tiles.contains(pos))
         .for_each(|(pos, render)| {
             let dist = DistanceAlg::Pythagoras.distance2d(*player_pos, *pos);
             let tint_scale = tint_scale_calc(Some(dist), player_fov.radius as f32);
