@@ -3,6 +3,7 @@ use std::iter::Iterator;
 
 #[system]
 #[read_component(Carried)]
+#[read_component(Equipped)]
 #[read_component(Health)]
 #[read_component(Name)]
 #[read_component(Player)]
@@ -29,6 +30,23 @@ pub fn hud(ecs: &SubWorld) {
         draw_batch.print_color(
             Point::new(3, 2),
             "Items carried",
+            ColorPair::new(YELLOW, BLACK),
+        );
+    }
+
+    y = 3;
+    <(&Name, &Equipped)>::query()
+        .filter(component::<Item>())
+        .iter(ecs)
+        .filter(|(_, equipped)| equipped.by == player_entity)
+        .for_each(|(name, _)| {
+            draw_batch.print_right(Point::new(SCREEN_WIDTH * 2 - 3, y), &name.name);
+            y += 1;
+        });
+    if y > 3 {
+        draw_batch.print_color_right(
+            Point::new(SCREEN_WIDTH * 2 - 3, 2),
+            "Items equipped",
             ColorPair::new(YELLOW, BLACK),
         );
     }

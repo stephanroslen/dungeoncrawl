@@ -159,6 +159,14 @@ impl State {
                 entities_to_keep.insert(*entity);
             });
 
+        <(Entity, &Equipped)>::query()
+            .iter(&self.ecs)
+            .filter(|(_, equipped)| equipped.by == player_entity)
+            .map(|(entity, _)| entity)
+            .for_each(|entity| {
+                entities_to_keep.insert(*entity);
+            });
+
         let mut cb = CommandBuffer::new(&self.ecs);
         for entity in Entity::query().iter(&self.ecs) {
             if !entities_to_keep.contains(entity) {

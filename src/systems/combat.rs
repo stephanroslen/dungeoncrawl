@@ -5,7 +5,7 @@ use crate::prelude::*;
 #[read_component(Player)]
 #[write_component(Health)]
 #[read_component(Damage)]
-#[read_component(Carried)]
+#[read_component(Equipped)]
 pub fn combat(ecs: &mut SubWorld, commands: &mut CommandBuffer) {
     let victims: Vec<(Entity, Entity, Entity)> = <(Entity, &WantsToAttack)>::query()
         .iter(ecs)
@@ -23,9 +23,9 @@ pub fn combat(ecs: &mut SubWorld, commands: &mut CommandBuffer) {
             0
         };
 
-        let weapon_damage: i32 = <(&Carried, &Damage)>::query()
+        let weapon_damage: i32 = <(&Equipped, &Damage)>::query()
             .iter(ecs)
-            .filter(|(carried, _)| carried.by == *attacker)
+            .filter(|(equipped, _)| equipped.by == *attacker)
             .map(|(_, dmg)| dmg.damage)
             .sum();
 

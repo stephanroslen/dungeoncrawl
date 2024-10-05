@@ -23,6 +23,11 @@ pub struct Damage {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Enemy;
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Equipped {
+    pub by: Entity,
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct FieldOfView {
     pub visible_tiles: HashSet<Point>,
@@ -77,6 +82,12 @@ pub struct ProvidesDungeonMap;
 pub struct ProvidesHealing {
     pub amount: i32,
 }
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ProvidesDepletion;
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ProvidesEquipment;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Render {
