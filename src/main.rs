@@ -152,6 +152,7 @@ impl State {
         entities_to_keep.insert(player_entity);
 
         <(Entity, &Carried)>::query()
+            .filter(!component::<ProvidesDestructionOnLevelProgress>())
             .iter(&self.ecs)
             .filter(|(_, carry)| carry.by == player_entity)
             .map(|(entity, _)| entity)
@@ -160,6 +161,7 @@ impl State {
             });
 
         <(Entity, &Equipped)>::query()
+            .filter(!component::<ProvidesDestructionOnLevelProgress>())
             .iter(&self.ecs)
             .filter(|(_, equipped)| equipped.by == player_entity)
             .map(|(entity, _)| entity)

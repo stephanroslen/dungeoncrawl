@@ -87,6 +87,9 @@ pub struct ProvidesHealing {
 pub struct ProvidesDepletion;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ProvidesDestructionOnLevelProgress;
+
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ProvidesEquipment;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
