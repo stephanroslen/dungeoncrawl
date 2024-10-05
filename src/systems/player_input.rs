@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use std::collections::BTreeMap;
 
 fn use_item(n: usize, ecs: &mut SubWorld, commands: &mut CommandBuffer) -> Point {
     let player_entity = <Entity>::query()
@@ -7,12 +8,18 @@ fn use_item(n: usize, ecs: &mut SubWorld, commands: &mut CommandBuffer) -> Point
         .next()
         .map(|entity| *entity)
         .unwrap();
-    let item_entity = <(Entity, &Carried)>::query()
+
+    let mut some_carried_entry: BTreeMap<String, Entity> = BTreeMap::new();
+    <(Entity, &Name, &Carried)>::query()
         .filter(component::<Item>())
         .iter(ecs)
-        .filter(|(_, carried)| carried.by == player_entity)
-        .nth(n)
-        .map(|(entity, _)| *entity);
+        .filter(|(_, _, carried)| carried.by == player_entity)
+        .for_each(|(entity, name, _)| {
+            some_carried_entry.insert(name.name.clone(), *entity);
+        });
+
+    let item_entity = some_carried_entry.iter().nth(n).map(|(_, entity)| *entity);
+
     if let Some(item_entity) = item_entity {
         commands.push((
             (),
@@ -27,6 +34,7 @@ fn use_item(n: usize, ecs: &mut SubWorld, commands: &mut CommandBuffer) -> Point
 
 #[system]
 #[read_component(Carried)]
+#[read_component(Name)]
 #[read_component(Point)]
 #[write_component(Health)]
 pub fn player_input(

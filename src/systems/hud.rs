@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use std::collections::BTreeMap;
 use std::iter::Iterator;
 
 #[system]
@@ -17,15 +18,27 @@ pub fn hud(ecs: &SubWorld) {
         .map(|(entity, health, player)| (*entity, health, player.map_level))
         .unwrap();
 
-    let mut y = 3;
+    let mut carried: BTreeMap<String, usize> = BTreeMap::new();
     <(&Name, &Carried)>::query()
         .filter(component::<Item>())
         .iter(ecs)
         .filter(|(_, carried)| carried.by == player_entity)
         .for_each(|(name, _)| {
-            draw_batch.print(Point::new(3, y), format!("{} : {}", y - 2, name.name));
-            y += 1;
+            if let Some(entry) = carried.get_mut(&name.name) {
+                *entry += 1;
+            } else {
+                carried.insert(name.name.clone(), 1);
+            }
         });
+
+    let mut y = 3;
+    for (item, count) in carried {
+        draw_batch.print(
+            Point::new(3, y),
+            format!("{} : {} x {}", y - 2, count, item),
+        );
+        y += 1;
+    }
     if y > 3 {
         draw_batch.print_color(
             Point::new(3, 2),
