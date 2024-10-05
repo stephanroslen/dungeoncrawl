@@ -48,10 +48,13 @@ impl State {
         let mut map = map_builder.map;
         let exit_idx = Map::map_idx(map_builder.amulet_start);
         map.tiles[exit_idx] = TileType::Exit;
-        map_builder
-            .entity_spawns
-            .iter()
-            .for_each(|pos| spawn_entity(&mut ecs, &mut rng, *pos));
+        spawn_level(
+            &mut ecs,
+            &mut resources,
+            &mut rng,
+            0,
+            &map_builder.entity_spawns,
+        );
         resources.insert(map);
         resources.insert(Camera::new(map_builder.player_start));
         resources.insert(TurnState::AwaitingInput);
@@ -74,10 +77,13 @@ impl State {
         let exit_idx = Map::map_idx(map_builder.amulet_start);
         let mut map = map_builder.map;
         map.tiles[exit_idx] = TileType::Exit;
-        map_builder
-            .entity_spawns
-            .iter()
-            .for_each(|pos| spawn_entity(&mut self.ecs, &mut rng, *pos));
+        spawn_level(
+            &mut self.ecs,
+            &mut self.resources,
+            &mut rng,
+            0,
+            &map_builder.entity_spawns,
+        );
         self.resources.insert(map);
         self.resources.insert(Camera::new(map_builder.player_start));
         self.resources.insert(TurnState::AwaitingInput);
@@ -153,7 +159,7 @@ impl State {
                 entities_to_keep.insert(*entity);
             });
 
-        let mut cb = CommandBuffer::new(&mut self.ecs);
+        let mut cb = CommandBuffer::new(&self.ecs);
         for entity in Entity::query().iter(&self.ecs) {
             if !entities_to_keep.contains(entity) {
                 cb.remove(*entity);
@@ -182,10 +188,13 @@ impl State {
             let exit_idx = Map::map_idx(map_builder.amulet_start);
             map_builder.map.tiles[exit_idx] = TileType::Exit;
         }
-        map_builder
-            .entity_spawns
-            .iter()
-            .for_each(|pos| spawn_entity(&mut self.ecs, &mut rng, *pos));
+        spawn_level(
+            &mut self.ecs,
+            &mut self.resources,
+            &mut rng,
+            map_level as usize,
+            &map_builder.entity_spawns,
+        );
         self.resources.insert(map_builder.map);
         self.resources.insert(Camera::new(map_builder.player_start));
         self.resources.insert(TurnState::AwaitingInput);

@@ -16,6 +16,11 @@ pub struct Carried {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Damage {
+    pub damage: i32,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Enemy;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -96,3 +101,6 @@ pub struct WantsToMove {
     pub entity: Entity,
     pub destination: Point,
 }
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Weapon;

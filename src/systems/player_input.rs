@@ -55,6 +55,17 @@ pub fn player_input(
                     .for_each(|(entity, _)| {
                         commands.remove_component::<Point>(*entity);
                         commands.add_component(*entity, Carried { by: player });
+
+                        let entity_ref = ecs.entry_ref(*entity).unwrap();
+                        if entity_ref.get_component::<Weapon>().is_ok() {
+                            <(Entity, &Carried)>::query()
+                                .filter(component::<Weapon>())
+                                .iter(ecs)
+                                .filter(|(_, c)| c.by == player)
+                                .for_each(|(entity, _)| {
+                                    commands.remove(*entity);
+                                })
+                        }
                     });
                 Point::new(0, 0)
             }
