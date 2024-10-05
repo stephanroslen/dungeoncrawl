@@ -6,6 +6,7 @@ const NUM_TILES: usize = (SCREEN_WIDTH * SCREEN_HEIGHT) as usize;
 pub enum TileType {
     Wall,
     Floor,
+    Exit,
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -62,7 +63,8 @@ impl Map {
     }
 
     pub fn can_enter_tile(&self, point: Point) -> bool {
-        Self::in_bounds(point) && self.tiles[Self::map_idx(point)] == TileType::Floor
+        let tile_type = self.tiles[Self::map_idx(point)];
+        Self::in_bounds(point) && [TileType::Floor, TileType::Exit].contains(&tile_type)
     }
 
     pub fn map_idx(point: Point) -> usize {
@@ -96,7 +98,7 @@ impl Map {
     }
 
     fn is_opaque(tile_type: TileType) -> bool {
-        tile_type != TileType::Floor
+        tile_type == TileType::Wall
     }
 
     pub fn update_dijkstra_maps(&mut self) {

@@ -5,15 +5,15 @@ use std::iter::Iterator;
 #[read_component(Carried)]
 #[read_component(Health)]
 #[read_component(Name)]
+#[read_component(Player)]
 pub fn hud(ecs: &SubWorld) {
     let mut draw_batch = DrawBatch::new();
     draw_batch.target(2);
 
-    let (player_entity, player_health) = <(Entity, &Health)>::query()
-        .filter(component::<Player>())
+    let (player_entity, player_health, map_level) = <(Entity, &Health, &Player)>::query()
         .iter(ecs)
         .next()
-        .map(|(entity, health)| (*entity, health))
+        .map(|(entity, health, player)| (*entity, health, player.map_level))
         .unwrap();
 
     let mut y = 3;
@@ -51,6 +51,11 @@ pub fn hud(ecs: &SubWorld) {
             player_health.current, player_health.max
         ),
         ColorPair::new(WHITE, RED),
+    );
+    draw_batch.print_color_right(
+        Point::new(SCREEN_WIDTH * 2, SCREEN_HEIGHT * 2 - 2),
+        format!("Dungeon Level: {}", map_level + 1),
+        ColorPair::new(YELLOW, BLACK),
     );
 
     draw_batch.submit(10000).expect("Batch error");

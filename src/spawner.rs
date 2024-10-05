@@ -84,7 +84,7 @@ pub fn spawn_entity(ecs: &mut World, rng: &mut RandomNumberGenerator, pos: Point
 
 pub fn spawn_player(ecs: &mut World, pos: Point) {
     ecs.push((
-        Player,
+        Player { map_level: 0 },
         pos,
         Render {
             color: ColorPair::new(WHITE, BLACK),

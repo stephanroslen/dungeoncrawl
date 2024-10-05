@@ -45,12 +45,14 @@ impl State {
         let mut rng = RandomNumberGenerator::new();
         let map_builder = MapBuilder::new(&mut rng);
         spawn_player(&mut ecs, map_builder.player_start);
-        spawn_amulet_of_yala(&mut ecs, map_builder.amulet_start);
+        let mut map = map_builder.map;
+        let exit_idx = Map::map_idx(map_builder.amulet_start);
+        map.tiles[exit_idx] = TileType::Exit;
         map_builder
             .entity_spawns
             .iter()
             .for_each(|pos| spawn_entity(&mut ecs, &mut rng, *pos));
-        resources.insert(map_builder.map);
+        resources.insert(map);
         resources.insert(Camera::new(map_builder.player_start));
         resources.insert(TurnState::AwaitingInput);
         resources.insert(map_builder.theme);
@@ -69,12 +71,14 @@ impl State {
         let mut rng = RandomNumberGenerator::new();
         let map_builder = MapBuilder::new(&mut rng);
         spawn_player(&mut self.ecs, map_builder.player_start);
-        spawn_amulet_of_yala(&mut self.ecs, map_builder.amulet_start);
+        let exit_idx = Map::map_idx(map_builder.amulet_start);
+        let mut map = map_builder.map;
+        map.tiles[exit_idx] = TileType::Exit;
         map_builder
             .entity_spawns
             .iter()
             .for_each(|pos| spawn_entity(&mut self.ecs, &mut rng, *pos));
-        self.resources.insert(map_builder.map);
+        self.resources.insert(map);
         self.resources.insert(Camera::new(map_builder.player_start));
         self.resources.insert(TurnState::AwaitingInput);
         self.resources.insert(map_builder.theme);
@@ -129,6 +133,64 @@ impl State {
             self.reset_game_state();
         }
     }
+
+    fn advance_level(&mut self) {
+        let mut entities_to_keep = std::collections::HashSet::new();
+
+        let player_entity = *<Entity>::query()
+            .filter(component::<Player>())
+            .iter(&self.ecs)
+            .next()
+            .unwrap();
+
+        entities_to_keep.insert(player_entity);
+
+        <(Entity, &Carried)>::query()
+            .iter(&self.ecs)
+            .filter(|(_, carry)| carry.by == player_entity)
+            .map(|(entity, _)| entity)
+            .for_each(|entity| {
+                entities_to_keep.insert(*entity);
+            });
+
+        let mut cb = CommandBuffer::new(&mut self.ecs);
+        for entity in Entity::query().iter(&self.ecs) {
+            if !entities_to_keep.contains(entity) {
+                cb.remove(*entity);
+            }
+        }
+        cb.flush(&mut self.ecs, &mut self.resources);
+
+        <&mut FieldOfView>::query()
+            .iter_mut(&mut self.ecs)
+            .for_each(|fov| fov.is_dirty = true);
+
+        let mut rng = RandomNumberGenerator::new();
+        let mut map_builder = MapBuilder::new(&mut rng);
+
+        let mut map_level = 0;
+        <(&mut Player, &mut Point)>::query()
+            .iter_mut(&mut self.ecs)
+            .for_each(|(player, pos)| {
+                player.map_level += 1;
+                map_level = player.map_level;
+                *pos = map_builder.player_start;
+            });
+        if map_level == 2 {
+            spawn_amulet_of_yala(&mut self.ecs, map_builder.amulet_start);
+        } else {
+            let exit_idx = Map::map_idx(map_builder.amulet_start);
+            map_builder.map.tiles[exit_idx] = TileType::Exit;
+        }
+        map_builder
+            .entity_spawns
+            .iter()
+            .for_each(|pos| spawn_entity(&mut self.ecs, &mut rng, *pos));
+        self.resources.insert(map_builder.map);
+        self.resources.insert(Camera::new(map_builder.player_start));
+        self.resources.insert(TurnState::AwaitingInput);
+        self.resources.insert(map_builder.theme);
+    }
 }
 
 impl GameState for State {
@@ -154,6 +216,7 @@ impl GameState for State {
                 .execute(&mut self.ecs, &mut self.resources),
             TurnState::GameOver => self.game_over(ctx),
             TurnState::Victory => self.victory(ctx),
+            TurnState::NextLevel => self.advance_level(),
         };
         let mut draw_batch = DrawBatch::new();
         draw_batch.target(2);
